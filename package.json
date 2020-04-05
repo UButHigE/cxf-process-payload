@@ -1,9 +1,10 @@
 {
-    "name": "inovis-payload-process",
-    "displayName": "Inovis Process Payload",
+    "name": "cxf-payload-process",
+    "displayName": "Process CXF Payload",
     "description": "Format CXF payloads",
     "version": "0.1.0",
     "publisher": "dtforce",
+    "repository": "https://github.com/DTForce/cxf-process-payload",
     "engines": {
         "vscode": "^1.32.0"
     },
