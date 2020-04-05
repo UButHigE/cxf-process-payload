@@ -12,13 +12,13 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.processPayloadXML"
+        "onCommand:processCXF.processPayloadXML"
     ],
     "main": "./out/extension",
     "contributes": {
         "commands": [
             {
-                "command": "extension.processPayloadXML",
+                "command": "processCXF.processPayloadXML",
                 "title": "Process Payload (XML)"
             }
         ]

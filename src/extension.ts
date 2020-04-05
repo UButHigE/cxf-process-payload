@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 
 export function activate(context: vscode.ExtensionContext) {
-	let disposable = vscode.commands.registerCommand('extension.processPayloadXML', async function () {
+	let disposable = vscode.commands.registerCommand('processCXF.processPayloadXML', async function () {
 		// Get the active text editor
 		let editor = vscode.window.activeTextEditor;
 
