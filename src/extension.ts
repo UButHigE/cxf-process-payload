@@ -14,7 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
 			// Get the word within the selection
 			const input = document.getText(selection);
 			const updated = input.indexOf('Payload:') !== -1 ? 
-				input.substring(input.indexOf('Payload:') + 'Payload:'.length, input.indexOf('\n', input.indexOf('Payload:'))).trim() : input;
+				input.substring(input.indexOf('Payload:') + 'Payload:'.length).split("\n")[0].trim() : input;
 
 			await editor.edit(editBuilder => {
 				editBuilder.replace(selection, updated);
@@ -28,7 +28,20 @@ export function activate(context: vscode.ExtensionContext) {
 			);
 			
 			await vscode.commands.executeCommand('xmlTools.textToXml');
-			vscode.commands.executeCommand('editor.action.formatDocument')
+			await vscode.commands.executeCommand('editor.action.formatDocument')
+			
+			editor.selection = new vscode.Selection(
+				document.positionAt(0),
+				document.positionAt(0),
+			);
+
+			editor.revealRange(
+				new vscode.Range(
+					document.positionAt(0),
+					document.positionAt(0),
+				),
+				vscode.TextEditorRevealType.AtTop
+			)
 		}
 
 	});
