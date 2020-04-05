@@ -9,28 +9,26 @@ export function activate(context: vscode.ExtensionContext) {
 
 		if (editor) {
 			let document = editor.document;
-			let selection = editor.selection;
+			const selection = editor.selection;
 
 			// Get the word within the selection
-			let input = document.getText(selection);
-			let reversed = input.substring(input.indexOf('Payload:') + 'Payload:'.length).trim();
-			editor.edit(editBuilder => {
-				editBuilder.replace(selection, reversed);
+			const input = document.getText(selection);
+			const updated = input.indexOf('Payload:') !== -1 ? 
+				input.substring(input.indexOf('Payload:') + 'Payload:'.length, input.indexOf('\n', input.indexOf('Payload:'))).trim() : input;
+
+			await editor.edit(editBuilder => {
+				editBuilder.replace(selection, updated);
 			});
-
-			const definitions = await vscode.commands.executeCommand<vscode.Location[]>(
-				'vscode.executeDefinitionProvider',
-				editor.document.uri,
-				editor.selection.active
+			
+			document = await vscode.languages.setTextDocumentLanguage(editor.document, 'xml');
+			
+			editor.selection = new vscode.Selection(
+				document.positionAt(0),
+				document.positionAt(document.getText().length - 1)
 			);
-
-			if (!definitions) {
-				return;
-			}
-
-			for (const definition of definitions) {
-				console.log(definition);
-			}
+			
+			await vscode.commands.executeCommand('xmlTools.textToXml');
+			vscode.commands.executeCommand('editor.action.formatDocument')
 		}
 
 	});

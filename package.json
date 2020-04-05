@@ -1,9 +1,9 @@
 {
-    "name": "reverseword",
-    "displayName": "ReverseWord",
-    "description": "Reverse a word",
+    "name": "inovis-payload-process",
+    "displayName": "Inovis Process Payload",
+    "description": "Format CXF payloads",
     "version": "0.0.1",
-    "publisher": "rebornix",
+    "publisher": "dtforce",
     "engines": {
         "vscode": "^1.32.0"
     },
