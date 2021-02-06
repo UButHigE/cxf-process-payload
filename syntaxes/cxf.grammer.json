@@ -1,0 +1,96 @@
+{
+	"name": "CXF",
+	"scopeName": "source.cxf",
+	"patterns": [
+		{
+			"match": "(^|\\G)(RESP_IN|REQ_OUT)",
+			"captures": {
+				"2": {
+					"name": "keyword.other.leading.cxf"
+				}
+			}
+		},
+		{
+			"begin": "(^|\\G)\\s*(Payload)\\b\\s*(:)\\s*",
+			"beginCaptures": {
+				"2": {
+					"name": "keyword.other.payload.cxf"
+				},
+				"3": {
+					"name": "punctuation.separator.key-value.cxf"
+				}
+			},
+			"end": "(^|\\G)$",
+			"patterns": [
+				{
+					"begin": "(^|\\G)(?=.*<)",
+					"contentName": "text.xml",
+					"patterns":[
+						{
+							"include": "text.xml"
+						}
+					],
+					"end": "(^|\\G)$"
+				},
+				{
+					"begin": "(^|\\G)(?=.*{)",
+					"contentName": "source.json",
+					"patterns":[
+						{
+							"include": "source.json"
+						}
+					],
+					"end": "(^|\\G)$"
+				}
+			]
+		},
+		{
+			"begin": "(^|\\G)\\s*([a-zA-Z0-9_.-]+)\\b\\s*(:)",
+			"beginCaptures": {
+				"2": {
+					"name": "keyword.other.definition.ini"
+				},
+				"3": {
+					"name": "punctuation.separator.key-value.ini"
+				}
+			},
+			"end": "\\n"
+		},
+		{
+			"begin": "'",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.ini"
+				}
+			},
+			"end": "'",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.ini"
+				}
+			},
+			"name": "string.quoted.single.ini",
+			"patterns": [
+				{
+					"match": "\\\\.",
+					"name": "constant.character.escape.ini"
+				}
+			]
+		},
+		{
+			"begin": "\"",
+			"beginCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.begin.ini"
+				}
+			},
+			"end": "\"",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.string.end.ini"
+				}
+			},
+			"name": "string.quoted.double.ini"
+		}
+	]
+}

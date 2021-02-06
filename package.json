@@ -2,7 +2,7 @@
     "name": "cxf-payload-process",
     "displayName": "Process CXF Payload",
     "description": "Format CXF payloads",
-    "version": "0.2.0",
+    "version": "0.2.2",
     "publisher": "dtforce",
     "repository": "https://github.com/DTForce/cxf-process-payload",
     "engines": {
@@ -12,7 +12,9 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:processCXF.processPayloadXML"
+        "onCommand:processCXF.processPayloadXML",
+        "onLanguage:cxf",
+        "onUri"
     ],
     "main": "./out/extension",
     "contributes": {
@@ -20,6 +22,28 @@
             {
                 "command": "processCXF.processPayloadXML",
                 "title": "Process Payload (XML)"
+            }
+        ],
+        "languages": [
+            {
+                "id": "cxf",
+                "extensions": [
+                    ".cxf",
+                    ".req",
+                    ".resp"
+                ],
+                "configuration": "./language-config.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "cxf",
+                "scopeName": "source.cxf",
+                "path": "./syntaxes/cxf.grammer.json",
+                "embeddedLanguages": {
+                    "text.xml": "xml",
+                    "source.json": "json"
+                }
             }
         ]
     },
@@ -34,5 +58,9 @@
         "tslint": "^5.16.0",
         "typescript": "^3.5.1",
         "@types/vscode": "^1.32.0"
+    },
+    "dependencies": {
+        "html-entities": "^2.1.0",
+        "xml-formatter": "^2.4.0"
     }
 }
