@@ -61,6 +61,6 @@
     },
     "dependencies": {
         "html-entities": "^2.1.0",
-        "xml-formatter": "^2.4.0"
+        "tsxml": "^0.1.0"
     }
 }

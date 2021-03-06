@@ -2,46 +2,62 @@
 
 import * as vscode from 'vscode';
 import { decode } from 'html-entities';
+import * as xml from 'tsxml';
 
-var format = require('xml-formatter');
-
-function processXmlText(input: string) : string {
-	var offset = input.indexOf('Payload:');
-	var payload = offset !== -1 ? input.substring(offset + 'Payload:'.length).replace(/^\s*/, '') : input;
+async function processXmlText(input: string) : Promise<string> {
+	const offset = input.indexOf('Payload:');
+	const payload = offset !== -1 ? input.substring(offset + 'Payload:'.length).replace(/^\s*/, '') : input;
+	let formatted;
 	if (payload.startsWith('<')) {
-		payload = decode(payload)
-			.replace(/<\?xml[^>]*\?>/g, "")
+		const processed = decode(payload)
+			.replace(/(?<=<!\[CDATA\[.*)<\?xml[^>]*\?>/gs, "")
 			.replace("<![CDATA[", "")
 			.replace("]]>", "");
-		payload = format(payload, {collapseContent: true})
+
+		try {
+			formatted = await xml.Compiler.formatXmlString(processed, {
+				indentChar: '  ',
+				newlineChar: '\n',
+				attrParen: '"'
+			})
+		} catch(e) {
+			// our preprocessing probably crippled document, try agin by-passing it
+			console.warn(e)
+			formatted = await xml.Compiler.formatXmlString(payload, {
+				indentChar: '  ',
+				newlineChar: '\n',
+				attrParen: '"'
+			})
+		}
+		// inline tags with short and simple content
+		formatted = formatted.replace(/(?<=>)\n[ \t]+([^<>\n]{0,30}[^<> \t\n])[ \t]*\n[ \t]+(?=<)/mg, "$1")
 	} else {
-		payload =  JSON.stringify(JSON.parse(payload), null, 4)
+		formatted =  JSON.stringify(JSON.parse(payload), null, 4)
 	}
-	return input.substring(0, offset) + 'Payload: ' + payload;
+	return input.substring(0, offset) + 'Payload: ' + formatted;
 }
 
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 	vscode.window.registerUriHandler({
-		handleUri(uri:vscode.Uri) {
+		async handleUri(uri:vscode.Uri) {
 			const pathParts = uri.path.split('/');
 			console.log(uri.path);
-			    //Create output channel
-				let orange = vscode.window.createOutputChannel("XXX");
+			//Create output channel
+			let orange = vscode.window.createOutputChannel("orange");
 
-				//Write to output.
-				orange.appendLine("TEST");
-				orange.appendLine(JSON.stringify(pathParts));
+			//Write to output.
+			orange.appendLine("TEST");
+			orange.appendLine(JSON.stringify(pathParts));
 			if (pathParts[1] == 'base64') {
+				const result = await processXmlText(atob(pathParts[2]));
 				vscode.workspace.openTextDocument({
 					language: 'xml',
-					content: processXmlText(atob(pathParts[2]))
+					content: result
 				})
 			}
 		}
 	});
-
-	console.log("aaa");
 
 	let disposable = vscode.commands.registerCommand('processCXF.processPayloadXML', async function () {
 		// Get the active text editor
@@ -52,26 +68,13 @@ export function activate(context: vscode.ExtensionContext) {
 			const selection = editor.selection;
 
 			// Get the word within the selection
-			const updated = processXmlText(document.getText(selection));
+			const updated = await processXmlText(document.getText(selection));
 			await editor.edit(editBuilder => {
 				editBuilder.replace(selection, updated);
 			});
 			
-			// document = await vscode.languages.setTextDocumentLanguage(editor.document, 'xml');
+			document = await vscode.languages.setTextDocumentLanguage(editor.document, 'cxf');
 			
-			editor.selection = new vscode.Selection(
-				document.positionAt(0),
-				document.positionAt(document.getText().length - 1)
-			);
-			
-			await vscode.commands.executeCommand('xmlTools.textToXml');
-			await vscode.commands.executeCommand('editor.action.formatDocument')
-			
-			editor.selection = new vscode.Selection(
-				document.positionAt(0),
-				document.positionAt(0),
-			);
-
 			editor.revealRange(
 				new vscode.Range(
 					document.positionAt(0),
@@ -84,12 +87,12 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
     vscode.languages.registerDocumentFormattingEditProvider('cxf', {
-        provideDocumentFormattingEdits(document: vscode.TextDocument): vscode.TextEdit[] {
+        async provideDocumentFormattingEdits(document: vscode.TextDocument): Promise<vscode.TextEdit[]> {
 			const selection = new vscode.Selection(
 				document.positionAt(0),
 				document.positionAt(document.getText().length)
 			);
-			const updated = processXmlText(document.getText(selection));
+			const updated = await processXmlText(document.getText(selection));
 			return [vscode.TextEdit.replace(selection, updated)];
         }
     });
