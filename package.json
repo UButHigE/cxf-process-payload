@@ -2,7 +2,7 @@
     "name": "cxf-payload-process",
     "displayName": "Process CXF Payload",
     "description": "Format CXF payloads",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "publisher": "dtforce",
     "repository": "https://github.com/DTForce/cxf-process-payload",
     "engines": {

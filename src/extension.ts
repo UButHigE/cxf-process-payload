@@ -5,6 +5,7 @@ import { decode } from 'html-entities';
 import * as xml from 'tsxml';
 
 async function processXmlText(input: string) : Promise<string> {
+	input = input.replace(/(?<!\n) +(([A-Za-z]+: )(?=.*Payload: )|Payload: )/gs, "\n    $1")
 	const offset = input.indexOf('Payload:');
 	const payload = offset !== -1 ? input.substring(offset + 'Payload:'.length).replace(/^\s*/, '') : input;
 	let formatted;
