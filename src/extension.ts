@@ -65,14 +65,17 @@ export async function activate(context: vscode.ExtensionContext) {
 
 		if (editor) {
 			let document = editor.document;
-			const selection = editor.selection;
+			const selection = editor.selection.isEmpty ? new vscode.Selection(
+				document.positionAt(0),
+				document.positionAt(document.getText().length)
+			) : editor.selection;
 
-			// Get the word within the selection
 			const updated = await processXmlText(document.getText(selection));
 			await editor.edit(editBuilder => {
 				editBuilder.replace(selection, updated);
 			});
 			
+			// change the language of the document
 			document = await vscode.languages.setTextDocumentLanguage(editor.document, 'cxf');
 			
 			editor.revealRange(
